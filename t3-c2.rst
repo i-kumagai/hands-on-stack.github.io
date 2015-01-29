@@ -1,2 +1,104 @@
 ボリュームの作成と接続
 ================
+
+----
+
+概要
+================
+
+- ここではOpenStack上にボリュームを作成し、仮想サーバーにマウントします。
+- マウントしたボリュームが正しく機能しているかを確認します。
+
+----
+
+インスタンスの起動
+================
+
+- まず、インスタンスを起動します。
+
+novaコマンドの実行::
+
+  --- ここから ---
+  
+  nova boot --flavor standard.xsmall --image "centos-base" --key-name default server01
+  +--------------------------------------+----------------------------------------------------+
+  | Property                             | Value                                              |
+  +--------------------------------------+----------------------------------------------------+
+  | OS-DCF:diskConfig                    | MANUAL                                             |
+  | OS-EXT-AZ:availability_zone          | az1                                                |
+  | OS-EXT-STS:power_state               | 0                                                  |
+  | OS-EXT-STS:task_state                | scheduling                                         |
+  | OS-EXT-STS:vm_state                  | building                                           |
+  | OS-SRV-USG:launched_at               | -                                                  |
+  | OS-SRV-USG:terminated_at             | -                                                  |
+  | accessIPv4                           |                                                    |
+  | accessIPv6                           |                                                    |
+  | adminPass                            | KJwTqj7HCu4C                                       |
+  | config_drive                         |                                                    |
+  | created                              | 2015-01-29T12:59:42Z                               |
+  | flavor                               | standard.xsmall (100)                              |
+  | hostId                               |                                                    |
+  | id                                   | d53c42b6-7242-4b40-8581-647c01eb19fb               |
+  | image                                | centos-base (67609e44-8a9d-4800-8d00-1a2da2de694a) |
+  | key_name                             | default                                            |
+  | metadata                             | {}                                                 |
+  | name                                 | t3-c2                                              |
+  | os-extended-volumes:volumes_attached | []                                                 |
+  | progress                             | 0                                                  |
+  | security_groups                      | default                                            |
+  | status                               | BUILD                                              |
+  | tenant_id                            | 1db01a312acb44c49e53fc6655900cde                   |
+  | updated                              | 2015-01-29T12:59:43Z                               |
+  | user_id                              | 2a79144939f540d2b11fe726f9cab54f                   |
+  +--------------------------------------+----------------------------------------------------+
+
+  --- ここまで ---
+
+ボリュームの作成と接続
+================
+
+- 次にボリュームを作成します。
+
+cinderコマンドによるボリュームの作成::
+
+  --- ここから ---
+
+  cinder create --display-name new-volume 5
+　　+---------------------+--------------------------------------+
+　　|       Property      |                Value                 |
+　　+---------------------+--------------------------------------+
+　　|     attachments     |                  []                  |
+　　|  availability_zone  |                 az2                  |
+　　|       bootable      |                false                 |
+　　|      created_at     |      2015-01-29T12:13:40.743312      |
+　　| display_description |                 None                 |
+　　|     display_name    |                volume                |
+　　|          id         |         < 表示されるIDを控えます。>        |
+　　|       metadata      |                  {}                  |
+　　|         size        |                  5                   |
+　　|     snapshot_id     |                 None                 |
+　　|     source_volid    |                 None                 |
+　　|        status       |               creating               |
+　　|     volume_type     |                 None                 |
+　　+---------------------+--------------------------------------+
+  --- ここまで ---
+
+
+仮想マシンへのボリュームの接続
+================
+
+- 作成したボリュームを仮想マシンへ接続します。
+
+cinderコマンドによるボリュームの作成::
+
+  --- ここから ---
+　　nova volume-attach server01 <作成したボリュームのID>
+　　+----------+--------------------------------------+
+　　| Property | Value                                |
+　　+----------+--------------------------------------+
+　　| device   | /dev/vdc                             |
+　　| id       | 2237cdb7-7174-42fe-b169-a0e825ab9d52 |
+　　| serverId | d53c42b6-7242-4b40-8581-647c01eb19fb |
+　　| volumeId |　　　　 <作成したボリュームのID> 　　　　　　　　　　　　|
+　　+----------+--------------------------------------+
+  --- ここまで ---
