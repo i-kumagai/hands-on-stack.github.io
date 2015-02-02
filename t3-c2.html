@@ -1402,12 +1402,11 @@ aside {
 
 $ cd /opt/support/t3-c2
 $ ./01_init.sh
-Cleaning up...
-Booting student03-test-server...
-...（中略）...
-Done.
-...（中略）...
-
+# Creating seurity-group :sg-for-web-student03
+# Booting Server :t3-c2-student03
+# Create Floating IP
+# Associate Floating IP &lt;Floating IP&gt;
+# t3-c2-student03 : &lt;Floating IP&gt;
 --- ここまで ---
 </pre></section>
             
@@ -1445,7 +1444,7 @@ Done.
 <p>仮想マシンの操作:</p>
 <pre class="literal-block">
 --- ここから ---
-# ssh root&#64;&lt;Floating IP&gt; -i default.pem
+# ssh  -i ~/default.pem root&#64;&lt;Floating IP&gt; -i default.pem
 
 # lsblk
 NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
@@ -1486,16 +1485,9 @@ vdb    252:16   0  10G  0 disk /mnt
             
             
             <section><ul class="simple">
-<li>作成した仮想マシン上でサンプルアプリケーションが動作していることを確認します。</li>
+<li>ブラウザからサンプルアプリケーションを開き、データを登録します。</li>
 </ul>
-<p>仮想マシンの操作:</p>
-<pre class="literal-block">
---- ここから ---
-curl &lt;Floating IP&gt;
-
---- ここまで ---
-</pre>
-<p>上記コマンドでレスポンスが帰ってきたら、ブラウザからサンプルアプリケーションを開きます。</p></section>
+<img alt="./_assets/c2-t3/01-init.png" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlMAAAELCAIAAAByFpS4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAqvSURBVHhe7ddRkh0nEgVQ738nXqUHvUQEgipetVoat3XP+eiAJMFPMRV5Y/76BwCSSD4Askg+ALJIPgCySD4Askg+cv0Nf//dvwaSSD5ymXr4BjJJPnKZevgGMkk+cpl6+AYyXSTfX5t+8LJsv6b/xI+8c/fj//V/1OEHfNnffGbq4RvIdDGY9mk1V774LCv/iR955+7H/+v/qMMP+LK/+czUwzeQ6WIwXU6rUfzis+zSF//Ny8/7sr/28MOe/OZf/u/6/IOmHr6BTBez43KgjOIvn1//B1/8Ny8/78v+2sMPe/Kbf/m/6/MPmnr4BjJdzI7LgTKK82lbl75/6aWXXnrppZdeeumlH4uz+WjpHOt5UZZtWYq1vdQ7XnrppZe2u1WZj+Z1qUrT91OljOJ8VMVmrGvxOvymiqWXvuvVH/Wzl166f7Pvv59WcTcaShWbWldxqKNdP/6xobZVb0ZxVsWm769eqMVyZOrhG8j0wyAoy3Ro5spYvy02H6ovPcPSs2zHooxtLcq8vVvP7q4f7rbtqCzrZdHM62bfzpWxnhdj3cz1WjTzerbU57vzUa2XyrxdLKdjfVm8dNfZ1oejvno5tJW+n5h6+AYyXYyDPicm/eCltkux2SvNKJ5Ph8u2Zn5nXteimdfN3XapN3uleVicK+f187vN3XZflMv60nPn/OZl8dJd51x/fr25fKG5e/D5CzNTD99ApouhcJgUTZ22v7vRMKti0/cve2Woo0XVx+mybZaLd9u22NXRop+9jEothrlyXre/u2po5nVzt90X5bK+9Mza0WwUa1Fqe1m8dNc518/Xd+OoFmXeLuvdOKrFztTDN5DpYigcJkVTp3c9S/3cdne6W/r368tTd9ul/lDd2u/OlfN6vztbTu+2+6LM27Yufb9Zjsb2sn7XvLvrnOvPr8/uXm4+/7iph28g08VQOEyKZpwubbWdi209tnO9eVvfnTufb8+d5a7n4TuX64f9zd12X5S7+qW5p63Hdq43tZ2L31p/7JktR2M71w/XmycvNIcHH74wM/XwDWS6GAqHSdHMp2099NJUrHUVmyqWXnrppZdeurKcfmjbtMoo1rpUZdePX3rppZeu3u+r43rope/m4nK61w8Nsyru+vGrof7OizLXy1zcLUdju9eXyqxOSy/dv1xevT80D720XZmZevgGMt0OBf5b9vl+mPgUUw/fQCbD8c/x7f/pTHqVe6YevoFM5iO5TD18A5kkH7lMPXwDmSQfuUw9fAOZJB+52tSD/jWQRPIBkEXyAZBF8gGQRfIBkEXyAZBF8gGQRfIBkEXyAZBF8gGQRfIBkEXyAZBF8gGQRfIBkEXyAZBF8gGQRfIBkEXyAZBF8gGQRfIBkEXy/VH++utj/4PO/R+9+xM+8/MAfhWT5Y/yq5KvrWd7sSpN37/00r0nPbNz/+u/+V7vBvjOXPijLIO+Rv/ucNTU6euBb+b1bpwubW373E/0P/G8E4jyZjTcDZqqN30/WYrVNusHR711a74sHlR/0/ffXRYv3d0tvfSjfvbSS9/16sf/03Wr6ftNP/6uV7+bKz+3bn8X8+m+GNu3fq7/recPAmlO02HMjmWIzNv9aK/01WPzlcv1wzc//05rWHrO2+bQcLe+1BpGz9w8r+/sPXcvfHS9uGyrxeHW4uf6D1rD89eAQLcDYpkdY7vPlPmo1LYs27f2/qp89NnPv9OOSt+/nLfNXcPbzlkd3d09XGwuT+fisp716k29b15GpRZN1Uttl+KlubP9rcWd0VCL3dwGcOc0RPrqZWz3yXLXWdp21qv39p6qLPW3T/2+d2bPr++dd3f3K0vn3cVyeToXP7Oe3dUPfuLKh/zu94E/w9NJMWbKPlyWyoe2u7fvl3/xndl8en5/P7072ut3DbvLo8P1tp716tYzFsOynVXzpfPp5/3u94E/w6NJMQ+UfbgslfP0GadtsZsbhnPl27VN1atheFLZ3fW0+vn60rA375Xm8spSnLezcbQ0HLYfXe+W07354VPt6Ll+Z3M4AhjeT4plmuzD5W3D7O1s+uT7w+97Z/b2kdGwd76tzNu2LrWu4mwc7adLZd4e1rNevTKfXnYuDYt+sBlHh57dh5qBWG8mxT5K3lbO0+ftbDq///b68JveOW+bu4a3nU2r7PrZ5LJY6mhpuNy2v3dGTxnr12FXlTK2S73MxcuGS+c373yoGYh1mhSXc2QvLpUPbXeH99/enf2md87b5q7hbefu7u7h4pP/yuH6MPeM9b4otV2KpRXn+mXP7ieulA81A7FuJ8VhiJwH01I5by9dvv/k4uKXvLP0n7fNoeFufWf0PL+4ny6Vu+1cf9uzNDR7pVT9cPHS3LZfOTzy8H0g3GmILPrBSy9dDZq9WJ2ll97p3VN/30/6wVFv/cQ7e0PdKr30MrZ1VKoy9OrNxcVcf136pu9vLA17/1y5a35bnxvaurZjMczbOm36/t7Ss185PPLkfQCT4o8yj/49Qg6nw9JTlm0ztnU0jOJ+1NTpbj6qzlk/mPSDST+4OgJYmBQAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfAAk+eef/wHwB6DEgX1JQgAAAABJRU5ErkJggg==" style="width: 85%;" /></section>
             
           </div>
           <div class="presenter_notes">
@@ -1531,21 +1523,16 @@ curl &lt;Floating IP&gt;
 <p>cinderコマンドによるボリュームの作成:</p>
 <pre class="literal-block">
 --- ここから ---
-cinder create --display-name volume-${USER} 10
+cinder create --display-name vol01-${USER} 10
 +---------------------+--------------------------------------+
 |       Property      |                Value                 |
 +---------------------+--------------------------------------+
-|     attachments     |                  []                  |
-|  availability_zone  |                 az2                  |
-|       bootable      |                false                 |
+(中略)
 |      created_at     |      2015-01-29T12:13:40.743312      |
 | display_description |                 None                 |
-|     display_name    |                volume                |
+|     display_name    |            vol01-${USER}             |
 |          id         |     &lt; 表示されるIDを控えます。&gt;      |
-|       metadata      |                  {}                  |
-|         size        |                  5                   |
-|     snapshot_id     |                 None                 |
-|     source_volid    |                 None                 |
+(中略)
 |        status       |               creating               |
 |     volume_type     |                 None                 |
 +---------------------+--------------------------------------+
@@ -1581,12 +1568,12 @@ cinder create --display-name volume-${USER} 10
             
             
             <section><ul class="simple">
-<li>作成したボリュームを仮想マシンへ接続します。</li>
+<li>作成したボリュームを仮想マシンへ接続します。ボリュームの接続にはボリュームのUUIDを指定します。</li>
 </ul>
 <p>cinderコマンドによるボリュームの作成:</p>
 <pre class="literal-block">
 --- ここから ---
-nova volume-attach server01 &lt;作成したボリュームのID&gt;
+nova volume-attach t3-c2-${USER} &lt;作成したボリュームのID&gt;
 +----------+--------------------------------------+
 | Property | Value                                |
 +----------+--------------------------------------+
@@ -1632,14 +1619,13 @@ nova volume-attach server01 &lt;作成したボリュームのID&gt;
 <p>仮想マシンの操作:</p>
 <pre class="literal-block">
 --- ここから ---
-$ ssh root&#64;&lt;Floating IP&gt; -i default.pem
+$ ssh  -i ~/default.pem root&#64;&lt;Floating IP&gt;
 $ lsblk
 NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-vda    252:0    0  10G  0 disk
-└─vda1 252:1    0  10G  0 part /
-vdb    252:16   0  10G  0 disk /mnt
-vdc    252:32   0  10G  0 disk          &lt;- 追加されていることを確認
-
+vda     252:0    0  10G  0 disk
+└-vda1 252:1    0  10G  0 part /
+vdb     252:16   0  10G  0 disk /mnt
+vdc     252:32   0  10G  0 disk          &lt;- 追加されていることを確認
 --- ここまで ---
 </pre></section>
             
@@ -1677,25 +1663,23 @@ vdc    252:32   0  10G  0 disk          &lt;- 追加されていることを確�
 <p>仮想マシンの操作:</p>
 <pre class="literal-block">
 --- ここから ---
-# lsblk /dev/vdc
-NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-vdc 252:32 0 10G 0 disk
 # fdisk /dev/vdc
-コマンド (m でヘルプ): n
+コマンド (m でヘルプ): n                &lt;- &quot;n&quot; を入力
 p
-パーティション番号 (1-4): 1
-最初 シリンダ (1-20805, 初期値 1):
-Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):
-コマンド (m でヘルプ): p
+パーティション番号 (1-4): 1             &lt;- &quot;1&quot; を入力
+最初 シリンダ (1-20805, 初期値 1):      &lt;- Enterを押下(デフォルト)
+Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):   &lt;- Enterを押下(デフォルト)
+コマンド (m でヘルプ): p                &lt;- &quot;p&quot; を入力(設定確認)
 ...（中略）...
 デバイス ブート 始点 終点 ブロック Id システム
 /dev/vdc1 1 20805 10485688+ 83 Linux
 ...（中略）...
-コマンド (m でヘルプ): w
+コマンド (m でヘルプ): w                &lt;- &quot;w&quot; を入力(書き込み)
+
 # lsblk /dev/vdc
 NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
 vdc 252:32 0 10G 0 disk
-└─vdc1 252:33 0 10G 0 part
+└─vdc1 252:33 0 10G 0 part           &lt;- パーティションが作成されていることを確認
 
 --- ここまで ---
 </pre></section>
@@ -1730,6 +1714,7 @@ vdc 252:32 0 10G 0 disk
             
             <section><ul class="simple">
 <li>パーティションを作成できたら、ファイルシステムを作成して仮のマウントポイント/tmp/data にマウントします。</li>
+<li>ここではラベル &quot;mysql_data&quot; をつけています。</li>
 </ul>
 <p>仮想マシンの操作:</p>
 <pre class="literal-block">
@@ -1818,19 +1803,20 @@ drwx------ 2 mysql mysql 4096 8月 31 06:01 2014 test/
             
             
             <section><ul class="simple">
-<li>移動したデータでMySQLを起動します。</li>
+<li>移動したデータでMySQLを起動します。データを移した/tmp/dataを一旦アンマウントしてから、MySQLのデータディレクトリにマウントし直します。</li>
+<li>MySQL再起動後、サンプルアプリケーションの再起動を行います。</li>
 </ul>
 <p>仮想マシンの操作:</p>
 <pre class="literal-block">
 --- ここから ---
 # umount /tmp/data/
-# echo &quot;/dev/vdc1 /var/lib/mysql ext4 defaults,noatime 0 2&quot; &gt;&gt; /etc/fstab
-# mount /var/lib/mysql
+# mount LABEL=mysql_data /var/lib/mysql
 # df -h /var/lib/mysql
 Filesystem Size Used Avail Use% Mounted on
 /dev/vdc1 9.9G 172M 9.7G 2% /var/lib/mysql
 # service mysqld start
 # sh ~/sample-app/server-setup/rest.init.sh restart
+# exit
 --- ここまで ---
 </pre></section>
             
@@ -1864,7 +1850,8 @@ Filesystem Size Used Avail Use% Mounted on
             
             <section><ul class="simple">
 <li>ブラウザからサンプルアプリケーションを操作し、書き込みができることを確認します。</li>
-</ul></section>
+</ul>
+<img alt="./_assets/c2-t3/02-end.png" src="data:image/png;base64,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" style="width: 85%;" /></section>
             
           </div>
           <div class="presenter_notes">
@@ -1895,17 +1882,18 @@ Filesystem Size Used Avail Use% Mounted on
             
             
             <section><ul class="simple">
-<li>作成した仮想マシンを全て削除します。</li>
-<li>引き続きボリュームのスナップショットを行う場合は片付けをせずに実施できます。</li>
+<li>作業を完了する場合は、以下のコマンドを実行し、作成した仮想マシンとFloating-IPを全て削除してください。</li>
+<li>引き続きボリュームのスナップショット、バックアップを行う場合は片付けをせずに次に進んでください。</li>
 </ul>
 <p>コマンド実行の様子:</p>
-<blockquote>
+<pre class="literal-block">
 ---- ここから ----
 # exit
 # pwd
 /opt/support/t3-c2  # &lt;---「/opt/support/t3-c2」にいることを確認します。
 # ./99_cleanup.sh
----- ここまで ----</blockquote></section>
+---- ここまで ----
+</pre></section>
             
           </div>
           <div class="presenter_notes">
@@ -1936,9 +1924,8 @@ Filesystem Size Used Avail Use% Mounted on
             
             
             <section><ul class="simple">
-<li>仮想マシンをボリュームにマウントし、MySQLのデータをその上に移行しました。</li>
-<li>これにより仮想マシンを削除してもMySQLのデータが</li>
-<li>ボリュームのスナップショット機能、バックアップ機能が使えるようになります。</li>
+<li>仮想マシンをボリュームにマウントし、MySQLのデータをエフェメラルディスク上からボリューム上に移行しました。</li>
+<li>ボリュームのスナップショット機能、バックアップ機能を利用したデータの保護を行うことができるようになります。</li>
 </ul></section>
             
           </div>
@@ -1956,28 +1943,6 @@ Filesystem Size Used Avail Use% Mounted on
             
             <aside class="page_number">
               15/15
-            </aside>
-          </footer>
-        </div>
-      </div>
-      
-      <!-- slide source:  -->
-      <div class="slide-wrapper">
-        <div class="slide">
-          <div class="inner">
-            
-            
-          </div>
-          <div class="presenter_notes">
-            <header><h1>Presenter Notes</h1></header>
-            <section>
-            
-            </section>
-          </div>
-          <footer>
-            
-            <aside class="page_number">
-              /15
             </aside>
           </footer>
         </div>
