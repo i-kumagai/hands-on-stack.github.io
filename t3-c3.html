@@ -1331,6 +1331,12 @@ aside {
             <header><h1>スナップショットとリストア</h1></header>
             
             
+            <section><h1>概要</h1>
+<ul class="simple">
+<li>ここでは作成しデータを書き込みしたボリュームのスナップショットを作成し、さらにそのスナップショットからボリュームをリストアします。</li>
+<li>リストアしたボリュームがスナップショット作成前のボリュームと同じ内容であることを確認します。</li>
+</ul></section>
+            
           </div>
           <div class="presenter_notes">
             <header><h1>Presenter Notes</h1></header>
@@ -1345,7 +1351,365 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/1
+              1/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>はじめに操作環境を準備します。</li>
+<li>「ボリュームの作成と接続」を実施している場合この操作は不要です。</li>
+</ul>
+<p>コマンド実行の様子:</p>
+<pre class="literal-block">
+---- ここから ----
+---- ここまで ----
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>DBの停止とアンマウント</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>最初にDBを停止してボリュームをアンマウントします。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# service mysqld stop
+# umount /var/lib/mysql
+# exit
+# nova volume-detach ${} ${MY_VOL01}
+--- ここまで ---
+</pre>
+
+
+<h1>スナップショットの作成</h1>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+# cinder list
++--------------------------------------+-----------+--------------+------+-------------+----------+-------------+
+|                 ID                   |  Status   | Display Name | Size | Volume Type | Bootable | Attached to |
++--------------------------------------+-----------+--------------+------+-------------+----------+-------------+
+| da3e922c-c98b-4f73-9b8c-7eb060bc466e | available | dbs_vol01    |  10  | standard    |  false   |             |
++--------------------------------------+-----------+--------------+------+-------------+----------+-------------+
+
+# cider snapshot-create --display-name dbs_vol01-snap001 $
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>スナップショットの作成</h1></header>
+            
+            
+            <section><p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+# nova volume-attach dbs01 $MY_DBS_VOL01
++----------+--------------------------------------+
+| Property | Value |
++----------+--------------------------------------+
+| device | /dev/vdc |
+| id | da3e922c-c98b-4f73-9b8c-7eb060bc466e |
+...（以下省略）...
+
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# mount /var/lib/mysql/ &amp;&amp; service mysqld start
+# sh /root/sample-app/server-setup/rest.init.sh restart
+# exit
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>データの追加</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>画面からデータを追加します</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>スナップショットからのリストア</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>取得したスナップショットからデータをリストアします。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+
+# source getuuid.sh
+# export MY_DBS_VOL01_SNAP001=`cinder snapshot-show dbs_vol01-snap001 |get_uuid`
+# echo $MY_DBS_VOL01_SNAP001
+# cinder create --snapshot-id $MY_DBS_VOL01_SNAP001 --display-name dbs_vol01_res 10
+# cinder list
+--- ここまで ---
+</pre>
+
+
+<h1>リストアしたボリュームのマウント</h1>
+<ul class="simple">
+<li>リストアしたボリュームをマウントし、データがスナップショット取得前に戻っていることを確認します。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+
+# nova volume-attach allinone-student03 151c7204-8486-4071-bcbb-c4e7f118e53b
++----------+--------------------------------------+
+| Property | Value                                |
++----------+--------------------------------------+
+| device   | /dev/vdd                             |
+(後略)
+
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# lsblk
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+～～～（中略）～～～
+vdc 252:32 0 10G 0 disk
+  vdc1 252:33 0 10G 0 part /var/lib/mysql
+vdd 252:48 0 10G 0 disk
+  vdd1 252:49 0 10G 0 part
+# service mysqld stop &amp;&amp; umount /var/lib/mysql
+# mount /dev/vdd1 /var/lib/mysql/ &amp;&amp; service mysqld start
+# mysql -u root sample_bbs -e 'select * from contents;'
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>サンプルアプリケーションの再起動</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>サンプルアプリケーションを再起動し、ブラウザ上でもデータが前に戻っていることを確認します。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>後片付け</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c3.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c3.rst">t3-c3.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/9
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source:  -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="page_number">
+              /9
             </aside>
           </footer>
         </div>
@@ -1362,6 +1726,54 @@ aside {
       <tr id="toc-row-1">
         <th><a href="#slide1">スナップショットとリストア</a></th>
         <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">操作環境の準備</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">DBの停止とアンマウント</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">スナップショットの作成</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">データの追加</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">スナップショットからのリストア</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">サンプルアプリケーションの再起動</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">後片付け</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">まとめ</a></th>
+        <td><a href="#slide9">9</a></td>
       </tr>
       
       

@@ -1345,7 +1345,639 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/1
+              1/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>概要</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ここではサンプルアプリケーションのデータベース上のデータをボリュームに移行します。</li>
+<li>まずOpenStack上にボリュームを作成し、サンプルアプリケーションの稼働する仮想サーバーにマウントします。</li>
+<li>マウントしたボリュームにデータベース上のデータを移行し、サンプルアプリケーションを稼働させます。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>下記のコマンドではサンプルアプリケーションの動作する仮想サーバーを起動し、Floating IPを割り当てています。起動には１分から数分かかります。</li>
+</ul>
+<p>初期設定実行:</p>
+<pre class="literal-block">
+--- ここから ---
+
+$ cd /opt/support/t3-c2
+$ ./01_init.sh
+Cleaning up...
+Booting student03-test-server...
+...（中略）...
+Done.
+...（中略）...
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の確認(1)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシンにログインし、ディスクの状態を確認します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# ssh root&#64;&lt;Floating IP&gt; -i default.pem
+
+# lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    252:0    0  10G  0 disk
+└─vda1 252:1    0  10G  0 part /
+vdb    252:16   0  10G  0 disk /mnt
+
+# exit
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の確認(2)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシン上でサンプルアプリケーションが動作していることを確認します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+curl &lt;Floating IP&gt;
+
+--- ここまで ---
+</pre>
+<p>上記コマンドでレスポンスが帰ってきたら、ブラウザからサンプルアプリケーションを開きます。</p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームの作成と接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>それではボリュームを作成します。</li>
+</ul>
+<p>cinderコマンドによるボリュームの作成:</p>
+<pre class="literal-block">
+--- ここから ---
+cinder create --display-name volume-${USER} 10
++---------------------+--------------------------------------+
+|       Property      |                Value                 |
++---------------------+--------------------------------------+
+|     attachments     |                  []                  |
+|  availability_zone  |                 az2                  |
+|       bootable      |                false                 |
+|      created_at     |      2015-01-29T12:13:40.743312      |
+| display_description |                 None                 |
+|     display_name    |                volume                |
+|          id         |     &lt; 表示されるIDを控えます。&gt;      |
+|       metadata      |                  {}                  |
+|         size        |                  5                   |
+|     snapshot_id     |                 None                 |
+|     source_volid    |                 None                 |
+|        status       |               creating               |
+|     volume_type     |                 None                 |
++---------------------+--------------------------------------+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシンへのボリュームの接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成したボリュームを仮想マシンへ接続します。</li>
+</ul>
+<p>cinderコマンドによるボリュームの作成:</p>
+<pre class="literal-block">
+--- ここから ---
+nova volume-attach server01 &lt;作成したボリュームのID&gt;
++----------+--------------------------------------+
+| Property | Value                                |
++----------+--------------------------------------+
+| device   | /dev/vdc                             |
+| id       | 2237cdb7-7174-42fe-b169-a0e825ab9d52 |
+| serverId | d53c42b6-7242-4b40-8581-647c01eb19fb |
+| volumeId |     &lt;作成したボリュームのID&gt;         |
++----------+--------------------------------------+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシンへのログイン</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシンにログインしディスクが接続されていることを確認します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+$ ssh root&#64;&lt;Floating IP&gt; -i default.pem
+$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    252:0    0  10G  0 disk
+└─vda1 252:1    0  10G  0 part /
+vdb    252:16   0  10G  0 disk /mnt
+vdc    252:32   0  10G  0 disk          &lt;- 追加されていることを確認
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームのパーティション</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ディスクのパーティションを行います。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# lsblk /dev/vdc
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vdc 252:32 0 10G 0 disk
+# fdisk /dev/vdc
+コマンド (m でヘルプ): n
+p
+パーティション番号 (1-4): 1
+最初 シリンダ (1-20805, 初期値 1):
+Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):
+コマンド (m でヘルプ): p
+...（中略）...
+デバイス ブート 始点 終点 ブロック Id システム
+/dev/vdc1 1 20805 10485688+ 83 Linux
+...（中略）...
+コマンド (m でヘルプ): w
+# lsblk /dev/vdc
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vdc 252:32 0 10G 0 disk
+└─vdc1 252:33 0 10G 0 part
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ディスクのフォーマット</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>パーティションを作成できたら、ファイルシステムを作成して仮のマウントポイント/tmp/data にマウントします。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+ # mkfs.ext4 -L mysql_data /dev/vdc1
+ # tune2fs -c 0 -i 0 -r 0 /dev/vdc1
+ # mkdir /tmp/data
+ # mount LABEL=mysql_data /tmp/data
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQL データの移行(1)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>MySQLを停止してデータを移行します。まずは、仮のマウントポイントにマウントしデータを移動します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# chown -R mysql:mysql /tmp/data
+# service mysqld stop
+# mv /var/lib/mysql/* /tmp/data/
+# ls -lF /tmp/data/
+-rw-rw---- 1 mysql mysql 5242880 9月 3 16:01 2014 ib_logfile0
+-rw-rw---- 1 mysql mysql 5242880 8月 31 06:01 2014 ib_logfile1
+-rw-rw---- 1 mysql mysql 10485760 9月 3 16:01 2014 ibdata1
+drwx------ 2 mysql mysql 16384 8月 31 06:01 2014 lost+found/
+drwx------ 2 mysql mysql 4096 8月 31 06:01 2014 mysql/
+drwx------ 2 mysql mysql 4096 8月 31 06:06 2014 sample_bbs/
+drwx------ 2 mysql mysql 4096 8月 31 06:01 2014 test/
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQL データの移行(2)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>移動したデータでMySQLを起動します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# umount /tmp/data/
+# echo &quot;/dev/vdc1 /var/lib/mysql ext4 defaults,noatime 0 2&quot; &gt;&gt; /etc/fstab
+# mount /var/lib/mysql
+# df -h /var/lib/mysql
+Filesystem Size Used Avail Use% Mounted on
+/dev/vdc1 9.9G 172M 9.7G 2% /var/lib/mysql
+# service mysqld start
+# sh ~/sample-app/server-setup/rest.init.sh restart
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              12/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>サンプルアプリケーションの動作確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ブラウザからサンプルアプリケーションを操作し、書き込みができることを確認します。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              13/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>後片付け</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシンを全て削除します。</li>
+<li>引き続きボリュームのスナップショットを行う場合は片付けをせずに実施できます。</li>
+</ul>
+<p>コマンド実行の様子:</p>
+<blockquote>
+---- ここから ----
+# exit
+# pwd
+/opt/support/t3-c2  # &lt;---「/opt/support/t3-c2」にいることを確認します。
+# ./99_cleanup.sh
+---- ここまで ----</blockquote></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              14/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>仮想マシンをボリュームにマウントし、MySQLのデータをその上に移行しました。</li>
+<li>これにより仮想マシンを削除してもMySQLのデータが</li>
+<li>ボリュームのスナップショット機能、バックアップ機能が使えるようになります。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              15/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source:  -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="page_number">
+              /15
             </aside>
           </footer>
         </div>
@@ -1362,6 +1994,90 @@ aside {
       <tr id="toc-row-1">
         <th><a href="#slide1">ボリュームの作成と接続</a></th>
         <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">概要</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">操作環境の準備</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">操作環境の確認(1)</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">操作環境の確認(2)</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">ボリュームの作成と接続</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">仮想マシンへのボリュームの接続</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">仮想マシンへのログイン</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">ボリュームのパーティション</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">ディスクのフォーマット</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">MySQL データの移行(1)</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-12">
+        <th><a href="#slide12">MySQL データの移行(2)</a></th>
+        <td><a href="#slide12">12</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-13">
+        <th><a href="#slide13">サンプルアプリケーションの動作確認</a></th>
+        <td><a href="#slide13">13</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-14">
+        <th><a href="#slide14">後片付け</a></th>
+        <td><a href="#slide14">14</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-15">
+        <th><a href="#slide15">まとめ</a></th>
+        <td><a href="#slide15">15</a></td>
       </tr>
       
       
