@@ -24,12 +24,11 @@
   
   $ cd /opt/support/t3-c2
   $ ./01_init.sh
-  Cleaning up...
-  Booting student03-test-server...
-  ...（中略）...
-  Done.
-  ...（中略）...
-
+  # Creating seurity-group :sg-for-web-student03
+  # Booting Server :t3-c2-student03
+  # Create Floating IP
+  # Associate Floating IP <Floating IP>
+  # t3-c2-student03 : <Floating IP>
   --- ここまで ---
 
 ----
@@ -42,7 +41,7 @@
 仮想マシンの操作::
 
   --- ここから ---
-  # ssh root@<Floating IP> -i default.pem
+  # ssh  -i ~/default.pem root@<Floating IP> -i default.pem
   
   # lsblk
   NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
@@ -58,18 +57,10 @@
 操作環境の確認(2)
 ================
 
-- 作成した仮想マシン上でサンプルアプリケーションが動作していることを確認します。
+- ブラウザからサンプルアプリケーションを開き、データを登録します。
 
-仮想マシンの操作::
-
-  --- ここから ---
-  curl <Floating IP>
-  
-  --- ここまで ---
-
-上記コマンドでレスポンスが帰ってきたら、ブラウザからサンプルアプリケーションを開きます。
-
-
+.. image:: ./_assets/c2-t3/01-init.png
+   :width: 85%
 
 ----
 
@@ -82,21 +73,16 @@
 cinderコマンドによるボリュームの作成::
 
   --- ここから ---
-  cinder create --display-name volume-${USER} 10 
+  cinder create --display-name vol01-${USER} 10 
   +---------------------+--------------------------------------+
   |       Property      |                Value                 |
   +---------------------+--------------------------------------+
-  |     attachments     |                  []                  |
-  |  availability_zone  |                 az2                  |
-  |       bootable      |                false                 |
+  (中略)
   |      created_at     |      2015-01-29T12:13:40.743312      |
   | display_description |                 None                 |
-  |     display_name    |                volume                |
+  |     display_name    |            vol01-${USER}             |
   |          id         |     < 表示されるIDを控えます。>      |
-  |       metadata      |                  {}                  |
-  |         size        |                  5                   |
-  |     snapshot_id     |                 None                 |
-  |     source_volid    |                 None                 |
+  (中略)
   |        status       |               creating               |
   |     volume_type     |                 None                 |
   +---------------------+--------------------------------------+
@@ -107,12 +93,12 @@ cinderコマンドによるボリュームの作成::
 仮想マシンへのボリュームの接続
 ================
 
-- 作成したボリュームを仮想マシンへ接続します。
+- 作成したボリュームを仮想マシンへ接続します。ボリュームの接続にはボリュームのUUIDを指定します。
 
 cinderコマンドによるボリュームの作成::
 
   --- ここから ---
-  nova volume-attach server01 <作成したボリュームのID>
+  nova volume-attach t3-c2-${USER} <作成したボリュームのID>
   +----------+--------------------------------------+
   | Property | Value                                |
   +----------+--------------------------------------+
@@ -134,14 +120,13 @@ cinderコマンドによるボリュームの作成::
 仮想マシンの操作::
 
   --- ここから ---
-  $ ssh root@<Floating IP> -i default.pem
+  $ ssh  -i ~/default.pem root@<Floating IP>
   $ lsblk
   NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-  vda    252:0    0  10G  0 disk 
-  └─vda1 252:1    0  10G  0 part /
-  vdb    252:16   0  10G  0 disk /mnt
-  vdc    252:32   0  10G  0 disk          <- 追加されていることを確認
-
+  vda     252:0    0  10G  0 disk 
+  └-vda1 252:1    0  10G  0 part /
+  vdb     252:16   0  10G  0 disk /mnt
+  vdc     252:32   0  10G  0 disk          <- 追加されていることを確認
   --- ここまで ---
 
 ----
@@ -155,25 +140,23 @@ cinderコマンドによるボリュームの作成::
 仮想マシンの操作::
 
   --- ここから ---
-  # lsblk /dev/vdc
-  NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-  vdc 252:32 0 10G 0 disk
   # fdisk /dev/vdc
-  コマンド (m でヘルプ): n
+  コマンド (m でヘルプ): n                <- "n" を入力
   p
-  パーティション番号 (1-4): 1
-  最初 シリンダ (1-20805, 初期値 1):
-  Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):
-  コマンド (m でヘルプ): p
+  パーティション番号 (1-4): 1             <- "1" を入力
+  最初 シリンダ (1-20805, 初期値 1):      <- Enterを押下(デフォルト)
+  Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):   <- Enterを押下(デフォルト)
+  コマンド (m でヘルプ): p                <- "p" を入力(設定確認)
   ...（中略）...
   デバイス ブート 始点 終点 ブロック Id システム
   /dev/vdc1 1 20805 10485688+ 83 Linux
   ...（中略）...
-  コマンド (m でヘルプ): w
+  コマンド (m でヘルプ): w                <- "w" を入力(書き込み)
+  
   # lsblk /dev/vdc
   NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
   vdc 252:32 0 10G 0 disk
-  └─vdc1 252:33 0 10G 0 part
+  └─vdc1 252:33 0 10G 0 part           <- パーティションが作成されていることを確認
   
   --- ここまで ---
 
@@ -183,6 +166,7 @@ cinderコマンドによるボリュームの作成::
 ================
 
 - パーティションを作成できたら、ファイルシステムを作成して仮のマウントポイント/tmp/data にマウントします。
+- ここではラベル "mysql_data" をつけています。
 
 仮想マシンの操作::
 
@@ -221,19 +205,20 @@ MySQL データの移行(1)
 MySQL データの移行(2)
 ================
 
-- 移動したデータでMySQLを起動します。
+- 移動したデータでMySQLを起動します。データを移した/tmp/dataを一旦アンマウントしてから、MySQLのデータディレクトリにマウントし直します。
+- MySQL再起動後、サンプルアプリケーションの再起動を行います。
 
 仮想マシンの操作::
 
   --- ここから ---
   # umount /tmp/data/
-  # echo "/dev/vdc1 /var/lib/mysql ext4 defaults,noatime 0 2" >> /etc/fstab
-  # mount /var/lib/mysql
+  # mount LABEL=mysql_data /var/lib/mysql
   # df -h /var/lib/mysql
   Filesystem Size Used Avail Use% Mounted on
   /dev/vdc1 9.9G 172M 9.7G 2% /var/lib/mysql
   # service mysqld start
   # sh ~/sample-app/server-setup/rest.init.sh restart
+  # exit
   --- ここまで ---
 
 ----
@@ -243,6 +228,8 @@ MySQL データの移行(2)
 
 - ブラウザからサンプルアプリケーションを操作し、書き込みができることを確認します。
 
+.. image:: ./_assets/c2-t3/02-end.png
+   :width: 85%
 
 ----
 
@@ -250,8 +237,8 @@ MySQL データの移行(2)
 後片付け
 ================
 
-- 作成した仮想マシンを全て削除します。
-- 引き続きボリュームのスナップショットを行う場合は片付けをせずに実施できます。
+- 作業を完了する場合は、以下のコマンドを実行し、作成した仮想マシンとFloating-IPを全て削除してください。
+- 引き続きボリュームのスナップショット、バックアップを行う場合は片付けをせずに次に進んでください。
 
 コマンド実行の様子:
 
@@ -267,9 +254,8 @@ MySQL データの移行(2)
 まとめ
 ================
 
-- 仮想マシンをボリュームにマウントし、MySQLのデータをその上に移行しました。
-- これにより仮想マシンを削除してもMySQLのデータが
-- ボリュームのスナップショット機能、バックアップ機能が使えるようになります。
+- 仮想マシンをボリュームにマウントし、MySQLのデータをエフェメラルディスク上からボリューム上に移行しました。
+- ボリュームのスナップショット機能、バックアップ機能を利用したデータの保護を行うことができるようになります。
 
 ----
 
