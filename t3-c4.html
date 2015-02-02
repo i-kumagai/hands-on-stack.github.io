@@ -1331,6 +1331,13 @@ aside {
             <header><h1>バックアップとリストア</h1></header>
             
             
+            <section><h1>概要</h1>
+<ul class="simple">
+<li>OpenStackのCinder によるボリューム管理では スナップショット/クローンとバックアップという2つのデータ保護機能があります。</li>
+<li>ここではMySQLのデータが存在するボリュームをCinderのバックアップ機能によりバックアップし、そこからリストアする操作を行います。</li>
+<li>リストアしたボリュームがスナップショット作成前のボリュームと同じ内容であることを確認し、バックアップ機能を実感してください。</li>
+</ul></section>
+            
           </div>
           <div class="presenter_notes">
             <header><h1>Presenter Notes</h1></header>
@@ -1345,7 +1352,476 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/1
+              1/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>はじめに操作環境を準備します。</li>
+<li>「ボリュームの作成と接続」を実施している場合この操作は不要です。</li>
+</ul>
+<p>コマンド実行の様子:</p>
+<pre class="literal-block">
+---- ここから ----
+
+---- ここまで ----
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>DBの停止とアンマウント</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>最初にDBを停止してボリュームをアンマウントします。</li>
+<li>(補足) ボリュームを接続したままの状態では操作ができません。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# service mysqld stop
+# umount /var/lib/mysql
+# exit
+# nova volume-detach ${SERVERNAME} ${MY_VOL01}
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>バックアップの作成</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ボリュームのバックアップを作成します。</li>
+<li>バックアップはSwiftのコンテナ上に作成されます。作成中はボリュームの状態が「backing-up」、backupの状態が「creating」となり次の操作が実施できません。数分待って、状態がavailableになってから次の操作を行ってください。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+--- ここから ---
+# cinder backup-create ${MY_VOLID}
++-----------+--------------------------------------+
+|  Property |                Value                 |
++-----------+--------------------------------------+
+|     id    | 8acc7521-fddb-4a0a-9bc4-4ccc2a784768 |
+|    name   |                 None                 |
+| volume_id | 45dee040-cb87-4c38-be9b-1dca3aec25ce |
++-----------+--------------------------------------+
+# cinder list
++--------------------------------------+------------+------------------+------+-------------+----------+-------------+
+|                  ID                  |   Status   |   Display Name   | Size | Volume Type | Bootable | Attached to |
++--------------------------------------+------------+------------------+------+-------------+----------+-------------+
+| 45dee040-cb87-4c38-be9b-1dca3aec25ce | backing-up | volume-student03 |  10  |     None    |  false   |             |
++--------------------------------------+------------+------------------+------+-------------+----------+-------------+
+# cinder backup-list
++--------------------------------------+--------------------------------------+----------+------+------+--------------+---------------+
+|                  ID                  |              Volume ID               |  Status  | Name | Size | Object Count |   Container   |
++--------------------------------------+--------------------------------------+----------+------+------+--------------+---------------+
+| 0c6bfa72-65a9-4b31-8d08-f0df6aed3418 | 45dee040-cb87-4c38-be9b-1dca3aec25ce | creating | None |  10  |     None     | volumebackups |
++--------------------------------------+--------------------------------------+----------+------+------+--------------+---------------+
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Swift 上のバックアップデータの確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>本環境ではボリュームのバックアップはSwiftのコンテナ上にバックアップされます。バックアップされたデータをSwiftのコマンドで確認します。</li>
+<li></li>
+</ul>
+<p>コマンド操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# swift list volumebackups
+volume_45dee040-cb87-4c38-be9b-1dca3aec25ce/20150202025933/az_az2_backup_0c6bfa72-65a9-4b31-8d08-f0df6aed3418-00001
+(中略)
+volume_45dee040-cb87-4c38-be9b-1dca3aec25ce/20150202025933/az_az2_backup_0c6bfa72-65a9-4b31-8d08-f0df6aed3418_metadata
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームの再接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>バックアップが完了したらボリュームを再接続します。</li>
+</ul>
+<p>コマンド操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# nova volume-attach allinone-${USER} ${MY_VOL01}
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# mount LABEL=mysql_data /var/lib/mysql &amp;&amp; service mysqld start
+# sh /root/sample-app/server-setup/rest.init.sh restart
+# exit
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>リストア確認用データの登録</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ブラウザからFloating IP を開き、データを登録します。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>バックアップボリュームのリストア</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>リストア用のボリュームを作成します。バックアップしたボリュームと同サイズで作成してください。</li>
+<li>リストアにも数分かかります。cinder list コマンドで状態を確認し、「available」となってから次の操作に進んでください。</li>
+</ul>
+<p>コマンド操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# cinder create --display-name dbs_vol02 10
++---------------------+--------------------------------------+
+|       Property      |                Value                 |
+(略)
+|          id         | &lt;作成されたボリュームのID&gt;           |
+
+# cinder backup-restore --volume-id &lt;作成されたボリュームのID&gt; &lt;バックアップのID&gt;
+# cinder list
++--------------------------------------+------------------+------------------+------+-------------+----------+--------------------------------------+
+|                  ID                  |      Status      |   Display Name   | Size | Volume Type | Bootable |             Attached to              |
++--------------------------------------+------------------+------------------+------+-------------+----------+--------------------------------------+
+| 1e1de15c-138f-47ca-8e0a-8c848757a59e | restoring-backup |    dbs_vol02     |  10  |     None    |  false   |                                      |
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>リストアされたボリュームの接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>リストアされたボリュームを接続して、データベースとサンプルアプリケーションを再起動します。</li>
+</ul>
+<p>コマンド操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# nova volume-attach ${SERVERID} &lt;作成されたボリュームのID&gt;
+# ssh -i default.pem root&#64;${FLOATINGIP}
+# lsblk
+# service mysqld stop &amp;&amp; umount /var/lib/mysql
+# mount /dev/vdd1 /var/lib/mysql &amp;&amp; service mysqld start
+# sh /root/sample-app/server-setup/rest.init.sh restart
+# exit
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>リストアされたデータの確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ブラウザからサンプルアプリケーションを開き、データがリストアされていることを確認します。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>後片付け</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>後片付けをします。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ボリューム操作を確認しました。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c4.rst">t3-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              12/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source:  -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="page_number">
+              /12
             </aside>
           </footer>
         </div>
@@ -1362,6 +1838,72 @@ aside {
       <tr id="toc-row-1">
         <th><a href="#slide1">バックアップとリストア</a></th>
         <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">操作環境の準備</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">DBの停止とアンマウント</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">バックアップの作成</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">Swift 上のバックアップデータの確認</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">ボリュームの再接続</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">リストア確認用データの登録</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">バックアップボリュームのリストア</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">リストアされたボリュームの接続</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">リストアされたデータの確認</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">後片付け</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-12">
+        <th><a href="#slide12">まとめ</a></th>
+        <td><a href="#slide12">12</a></td>
       </tr>
       
       
